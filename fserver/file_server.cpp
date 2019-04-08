@@ -32,10 +32,12 @@ int main ()
 	        socket.recv(&file_pkt);
 	    		
 	        file_head_t fh;
+            //1. 文件路径长度
 	        memcpy(&fh.file_path_len, file_pkt.data(), sizeof(fh.file_path_len));
 	        fh.file_path_len = ntohl(fh.file_path_len);
 	        std::cout << "received file path len " << fh.file_path_len << std::endl;
-	    		
+	    	
+            //2.文件路径名
 	        socket.recv(&file_pkt);
 	    	memset(fh.file_path, 0, 128);
 	        memcpy(&fh.file_path, file_pkt.data(), fh.file_path_len);
@@ -48,15 +50,16 @@ int main ()
 	    	}
 	        while (1)
 	        {
+                // loop 3. 接收文件内容
 	    	    bool more = file_pkt.more();
 	    	    if (more)
 	    	    {
 	       	        socket.recv(&file_pkt);
 	    	        int size = fwrite((char*)file_pkt.data(), 1, file_pkt.size(), fp);
-	    			if (size != file_pkt.size())
-	    			{
-	    				std::cout << "fwrite file failed." << std::endl;
-	    			}
+	    		if (size != file_pkt.size())
+	    		{
+	    		    std::cout << "fwrite file failed." << std::endl;
+	    		}
 	    	    }
 	            else
 	    	    {
